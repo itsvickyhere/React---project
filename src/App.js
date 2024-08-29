@@ -6,7 +6,7 @@ import HomePage from './components/HomePage';
 import TrainDetailsPage from './components/TrainDetailsPage';
 import PassengerDetailsPage from './components/PassengerDetailsPage';
 import PaymentPage from './components/PaymentPage';
-import TicketDownload from './components/TicketDownload';
+import TicketDownload from './components/TicketPage';
 
 function App() {
   return (
@@ -22,6 +22,7 @@ function App() {
       </Routes>
     </Router>
   );
+  
 }
 
 export default App;
