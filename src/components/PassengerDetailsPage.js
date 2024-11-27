@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, TextField, Typography, Container, Box, List, ListItem, ListItemText } from '@mui/material';
+import { Button, TextField, Typography, Container, Box, List, ListItem, ListItemText, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 function PassengerDetailsPage() {
@@ -7,22 +7,22 @@ function PassengerDetailsPage() {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [id, setId] = useState('');
+  const [seat, setSeat] = useState('');
   const navigate = useNavigate();
 
   const handleAddPassenger = () => {
     const category = age < 12 ? 'Child' : age >= 60 ? 'Senior' : 'General';
     const price = category === 'Child' ? 500 : category === 'Senior' ? 700 : 1000;
-    setPassengers([...passengers, { name, age, id, category, price }]);
+    setPassengers([...passengers, { name, age, id, category, price, seat }]);
     setName('');
     setAge('');
     setId('');
+    setSeat('');
   };
 
-  const handleConfirm = () => {
+  const handleConfirmBooking = () => {
     navigate('/payment');
   };
-
-  const totalAmount = passengers.reduce((acc, curr) => acc + curr.price, 0);
 
   return (
     <Container maxWidth="md">
@@ -58,36 +58,46 @@ function PassengerDetailsPage() {
           onChange={(e) => setId(e.target.value)}
           required
         />
+        <FormControl fullWidth variant="outlined" margin="normal">
+          <InputLabel>Seat Type</InputLabel>
+          <Select
+            value={seat}
+            onChange={(e) => setSeat(e.target.value)}
+            label="Seat Type"
+            required
+          >
+            <MenuItem value="Window">Window</MenuItem>
+            <MenuItem value="Upper">Upper</MenuItem>
+            <MenuItem value="Lower">Lower</MenuItem>
+            <MenuItem value="Semi-Sleeper">Semi-Sleeper</MenuItem>
+          </Select>
+        </FormControl>
         <Button
           fullWidth
           variant="contained"
           color="primary"
           onClick={handleAddPassenger}
-          sx={{ borderRadius: 5, mt: 2 }}
+          sx={{ borderRadius: 5, mb: 2 }}
         >
           Add Passenger
         </Button>
         <List>
           {passengers.map((passenger, index) => (
-            <ListItem key={index} sx={{ borderBottom: '1px solid #ddd' }}>
+            <ListItem key={index}>
               <ListItemText
-                primary={`${passenger.name} (${passenger.category})`}
-                secondary={`Age: ${passenger.age}, ID: ${passenger.id}, Price: ₹${passenger.price}`}
+                primary={`Name: ${passenger.name}, Age: ${passenger.age}, ID: ${passenger.id}, Category: ${passenger.category}, Price: ${passenger.price}, Seat: ${passenger.seat}`}
               />
             </ListItem>
           ))}
         </List>
-        <Typography variant="h6" align="center" gutterBottom>
-          Total Amount: ₹{totalAmount}
-        </Typography>
         <Button
           fullWidth
           variant="contained"
           color="primary"
-          onClick={handleConfirm}
-          sx={{ borderRadius: 5, mt: 2 }}
+          onClick={handleConfirmBooking}
+          sx={{ borderRadius: 5 }}
         >
-          Confirm and Proceed to Payment
+          Proceed to Payment
         </Button>
       </Box>
     </Container>

@@ -1,71 +1,79 @@
+// LoginPage.js
 import React, { useState } from 'react';
-import { Button, TextField, Typography, Container, Box, Link } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+import { TextField, Button, Paper, Typography } from '@mui/material';
 
-function LoginPage() {
+const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (!email.endsWith('@gmail.com')) {
-      alert('Please enter a valid Gmail address.');
-      return;
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.get('http://localhost:5000/users', {
+        params: {
+          email,
+          password
+        }
+      });
+
+      const user = response.data.find(
+        (user) => user.email === email && user.password === password
+      );
+
+      if (user) {
+        alert('Login successful');
+        navigate('/home');  // Redirect to home page after login
+      } else {
+        setErrorMessage('Invalid email or password');
+      }
+    } catch (error) {
+      setErrorMessage('Error during login process');
     }
-    // Implement validation and login logic here
-    navigate('/home');
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box sx={{ mt: 8 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Login
-        </Typography>
+    <Paper style={{ padding: '20px', maxWidth: '400px', margin: 'auto', marginTop: '100px' }}>
+      <Typography variant="h5" style={{ marginBottom: '20px', textAlign: 'center' }}>Login</Typography>
+
+      <form onSubmit={handleLogin}>
         <TextField
-          fullWidth
           label="Email"
           variant="outlined"
-          margin="normal"
-          type="email"
+          fullWidth
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          style={{ marginBottom: '20px' }}
         />
+        
         <TextField
-          fullWidth
           label="Password"
+          type="password"
           variant="outlined"
-          margin="normal"
-          type={showPassword ? 'text' : 'password'}
+          fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          style={{ marginBottom: '20px' }}
         />
-        <Button
-          onClick={() => setShowPassword(!showPassword)}
-          sx={{ mb: 2 }}
-        >
-          {showPassword ? 'Hide' : 'Show'} Password
-        </Button>
-        <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          onClick={handleLogin}
-          sx={{ borderRadius: 5 }}
-        >
-          Login
-        </Button>
-        <Box textAlign="center" mt={2}>
-          <Link href="/signup" variant="body2">
-            Don't have an account? Sign Up
-          </Link>
-        </Box>
-      </Box>
-    </Container>
+
+        {errorMessage && (
+          <Typography color="error" style={{ marginBottom: '20px' }}>{errorMessage}</Typography>
+        )}
+        
+        <Button type="submit" variant="contained" color="primary" fullWidth>Login</Button>
+      </form>
+
+      <Typography style={{ marginTop: '20px', textAlign: 'center' }}>
+        Don't have an account? <Link to="/signup">Sign up here</Link>
+      </Typography>
+    </Paper>
   );
-}
+};
 
 export default LoginPage;

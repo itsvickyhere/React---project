@@ -1,87 +1,88 @@
+// SignUpPage.js
 import React, { useState } from 'react';
-import { Button, TextField, Typography, Container, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { TextField, Button, Paper, Typography } from '@mui/material';
 
-function SignUpPage() {
-  const [fullName, setFullName] = useState('');
-  const [age, setAge] = useState('');
+const SignUpPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleSignUp = () => {
-    // Implement validation and signup logic here
-    navigate('/home');
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+
+    try {
+      const newUser = {
+        email,
+        password,
+        fullName
+      };
+
+      // Check if the email already exists
+      const response = await axios.get('http://localhost:5000/users', {
+        params: { email }
+      });
+
+      if (response.data.length > 0) {
+        setErrorMessage('Email already exists. Please try logging in.');
+      } else {
+        // Add new user to the database
+        await axios.post('http://localhost:5000/users', newUser);
+        alert('Signup successful');
+        navigate('/'); // Redirect to login page after sign-up
+      }
+    } catch (error) {
+      setErrorMessage('Error during sign-up process');
+    }
   };
 
   return (
-    <Container maxWidth="xs" sx={{ mt: 8 }}>
-      <Box
-        sx={{
-          p: 3,
-          boxShadow: 3,
-          borderRadius: 2,
-          backgroundColor: 'white',
-        }}
-      >
-        <Typography variant="h4" align="center" gutterBottom>
-          Sign Up
-        </Typography>
+    <Paper style={{ padding: '20px', maxWidth: '400px', margin: 'auto', marginTop: '100px' }}>
+      <Typography variant="h5" style={{ marginBottom: '20px', textAlign: 'center' }}>Sign Up</Typography>
+
+      <form onSubmit={handleSignUp}>
         <TextField
-          fullWidth
           label="Full Name"
           variant="outlined"
-          margin="normal"
+          fullWidth
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           required
-          sx={{ borderRadius: 2 }}
+          style={{ marginBottom: '20px' }}
         />
+        
         <TextField
-          fullWidth
-          label="Age"
-          variant="outlined"
-          margin="normal"
-          type="number"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          required
-          sx={{ borderRadius: 2 }}
-        />
-        <TextField
-          fullWidth
           label="Email"
           variant="outlined"
-          margin="normal"
-          type="email"
+          fullWidth
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          sx={{ borderRadius: 2 }}
+          style={{ marginBottom: '20px' }}
         />
+
         <TextField
-          fullWidth
           label="Password"
-          variant="outlined"
-          margin="normal"
           type="password"
+          variant="outlined"
+          fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          sx={{ borderRadius: 2 }}
+          style={{ marginBottom: '20px' }}
         />
-        <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          onClick={handleSignUp}
-          sx={{ borderRadius: 5, mt: 2 }}
-        >
-          Sign Up
-        </Button>
-      </Box>
-    </Container>
+
+        {errorMessage && (
+          <Typography color="error" style={{ marginBottom: '20px' }}>{errorMessage}</Typography>
+        )}
+        
+        <Button type="submit" variant="contained" color="primary" fullWidth>Sign Up</Button>
+      </form>
+    </Paper>
   );
-}
+};
 
 export default SignUpPage;

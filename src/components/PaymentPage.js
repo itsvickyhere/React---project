@@ -8,6 +8,7 @@ function PaymentPage() {
   const [cvv, setCvv] = useState('');
   const navigate = useNavigate();
 
+  
   const handlePayment = () => {
     // Implement payment logic here
     navigate('/ticket');
